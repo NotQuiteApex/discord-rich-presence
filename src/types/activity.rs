@@ -35,14 +35,14 @@ impl Activity {
     }
 
     /// Sets the state of the activity.
-    pub fn state(mut self, state: String) -> Self {
-        self.state = Some(state);
+    pub fn state(mut self, state: impl ToString) -> Self {
+        self.state = Some(state.to_string());
         self
     }
 
     /// Sets the details of the activity.
-    pub fn details(mut self, details: String) -> Self {
-        self.details = Some(details);
+    pub fn details(mut self, details: impl ToString) -> Self {
+        self.details = Some(details.to_string());
         self
     }
 
@@ -139,8 +139,8 @@ impl Party {
     }
 
     /// Sets the ID of the party.
-    pub fn id(mut self, id: String) -> Self {
-        self.id = Some(id);
+    pub fn id(mut self, id: impl ToString) -> Self {
+        self.id = Some(id.to_string());
         self
     }
 
@@ -175,26 +175,26 @@ impl Assets {
     }
 
     /// Sets the name or URL of the art asset to be used as the large image.
-    pub fn large_image(mut self, large_image: String) -> Self {
-        self.large_image = Some(large_image);
+    pub fn large_image(mut self, large_image: impl ToString) -> Self {
+        self.large_image = Some(large_image.to_string());
         self
     }
 
     /// Sets the text to be shown when hovering over the large image.
-    pub fn large_text(mut self, large_text: String) -> Self {
-        self.large_text = Some(large_text);
+    pub fn large_text(mut self, large_text: impl ToString) -> Self {
+        self.large_text = Some(large_text.to_string());
         self
     }
 
     /// Sets the name or URL of the art asset to be used as the small image.
-    pub fn small_image(mut self, small_image: String) -> Self {
-        self.small_image = Some(small_image);
+    pub fn small_image(mut self, small_image: impl ToString) -> Self {
+        self.small_image = Some(small_image.to_string());
         self
     }
 
     /// Sets the text that is shown when hovering over the small image.
-    pub fn small_text(mut self, small_text: String) -> Self {
-        self.small_text = Some(small_text);
+    pub fn small_text(mut self, small_text: impl ToString) -> Self {
+        self.small_text = Some(small_text.to_string());
         self
     }
 }
@@ -219,20 +219,20 @@ impl Secrets {
     }
 
     /// Sets the secret for joining a game party.
-    pub fn join(mut self, join: String) -> Self {
-        self.join = Some(join);
+    pub fn join(mut self, join: impl ToString) -> Self {
+        self.join = Some(join.to_string());
         self
     }
 
     /// Sets the secret for spectating a match.
-    pub fn spectate(mut self, spectate: String) -> Self {
-        self.spectate = Some(spectate);
+    pub fn spectate(mut self, spectate: impl ToString) -> Self {
+        self.spectate = Some(spectate.to_string());
         self
     }
 
     /// Sets the secret for a specific, instanced match.
-    pub fn r#match(mut self, r#match: String) -> Self {
-        self.r#match = Some(r#match);
+    pub fn r#match(mut self, r#match: impl ToString) -> Self {
+        self.r#match = Some(r#match.to_string());
         self
     }
 }
@@ -256,8 +256,11 @@ impl Button {
     /// The label must be 1-32 characters long
     ///
     /// The URL must be 1-512 characters long
-    pub fn new(label: String, url: String) -> Self {
-        Button { label, url }
+    pub fn new(label: impl ToString, url: impl ToString) -> Self {
+        Button {
+            label: label.to_string(),
+            url: url.to_string(),
+        }
     }
 }
 
