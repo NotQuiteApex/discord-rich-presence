@@ -11,22 +11,21 @@ type Result<T> = std::result::Result<T, Error>;
 
 /// A client that connects to and communicates with the Discord IPC.
 ///
-/// Implemented via the [`DiscordIpcClient`](struct@crate::DiscordIpcClient) struct.
+/// Implemented via the [`DiscordIpcClient`](struct@crate::DiscordIpcClient)
+/// struct.
 pub trait DiscordIpc {
     /// Connects the client to the Discord IPC.
     ///
-    /// This method attempts to first establish a connection,
-    /// and then sends a handshake.
+    /// This method attempts to first establish a connection, and then sends
+    /// a handshake.
     ///
     /// # Errors
-    ///
-    /// Returns an `Err` variant if the client
-    /// fails to connect to the socket, or if it fails to
-    /// send a handshake.
+    /// Returns an `Err` variant if the client fails to connect to the socket,
+    /// or if it fails to send a handshake.
     ///
     /// # Examples
     /// ```
-    /// let mut client = discord_rich_presence::new_client("<some client id>")?;
+    /// let mut client = discord_rich_presence::new_client("<some client id>");
     /// client.connect()?;
     /// ```
     fn connect(&mut self) -> Result<()> {
@@ -38,21 +37,20 @@ pub trait DiscordIpc {
 
     /// Reconnects to the Discord IPC.
     ///
-    /// This method closes the client's active connection,
-    /// then re-connects it and re-sends a handshake.
+    /// This method closes the client's active connection, then re-connects it
+    /// and re-sends a handshake.
     ///
     /// # Errors
-    ///
-    /// Returns an `Err` variant if the client
-    /// failed to connect to the socket, or if it failed to
-    /// send a handshake.
+    /// Returns an `Err` variant if the client failed to connect to the socket,
+    /// or if it failed to send a handshake.
     ///
     /// # Examples
     /// ```
-    /// let mut client = discord_rich_presence::new_client("<some client id>")?;
+    /// let mut client = discord_rich_presence::new_client("<some client id>");
     /// client.connect()?;
     ///
-    /// client.close()?;
+    /// // Some time passes...
+    ///
     /// client.reconnect()?;
     /// ```
     fn reconnect(&mut self) -> Result<()> {
@@ -71,16 +69,15 @@ pub trait DiscordIpc {
 
     /// Handshakes the Discord IPC.
     ///
-    /// This method sends the handshake signal to the IPC.
-    /// It is usually not called manually, as it is automatically
-    /// called by [`connect`] and/or [`reconnect`].
-    ///
-    /// [`connect`]: #method.connect
-    /// [`reconnect`]: #method.reconnect
+    /// This method sends the handshake signal to the IPC. It is usually not
+    /// called manually, as it is automatically called by
+    /// [`connect`](Self::connect) and/or [`reconnect`](Self::reconnect).
     ///
     /// # Errors
-    ///
     /// Returns an `Err` variant if sending the handshake failed.
+    ///
+    /// # Examples
+    /// TODO
     fn send_handshake(&mut self) -> Result<()> {
         self.send(
             json!({
@@ -98,13 +95,14 @@ pub trait DiscordIpc {
 
     /// Sends JSON data to the Discord IPC.
     ///
-    /// This method takes data (`serde_json::Value`) and
-    /// an opcode as its parameters.
+    /// This method takes data (`serde_json::Value`) and an opcode as its
+    /// parameters.
     ///
     /// # Errors
-    /// Returns an `Err` variant if writing to the socket failed
+    /// Returns an `Err` variant if writing to the socket failed.
     ///
     /// # Examples
+    /// TODO
     /// ```
     /// let payload = serde_json::json!({ "field": "value" });
     /// client.send(payload, 0)?;
@@ -124,20 +122,14 @@ pub trait DiscordIpc {
 
     /// Receives an opcode and JSON data from the Discord IPC.
     ///
-    /// This method returns any data received from the IPC.
-    /// It returns a tuple containing the opcode, and the JSON data.
+    /// This method returns any data received from the IPC. It returns a tuple
+    /// containing the opcode, and the JSON data.
     ///
     /// # Errors
-    /// Returns an `Err` variant if reading the socket was
-    /// unsuccessful.
+    /// Returns an `Err` variant if reading the socket was unsuccessful.
     ///
     /// # Examples
-    /// ```
-    /// client.connect_ipc()?;
-    /// client.send_handshake()?;
-    ///
-    /// println!("{:?}", client.recv()?);
-    /// ```
+    /// TODO
     fn recv(&mut self) -> Result<(u32, Value)> {
         let mut header = [0; 8];
 
@@ -159,10 +151,17 @@ pub trait DiscordIpc {
 
     /// Sends a command to the Discord IPC.
     ///
-    /// This sends a command to Discord, as described
-    /// [here](https://discord.com/developers/docs/topics/rpc#commands-and-events).
+    /// This sends a command to Discord, as described [here]
+    /// (https://discord.com/developers/docs/topics/rpc#commands-and-events).
     ///
     /// The return value is the "data" field from the response payload.
+    ///
+    /// # Errors
+    /// Returns an `Err` variant if the command was malformed or rejected by
+    /// Discord.
+    ///
+    /// # Examples
+    /// TODO
     fn command(&mut self, cmd: &str, args: Value) -> Result<Value> {
         let nonce = Uuid::new_v4().to_string();
         let data = json!({
@@ -205,14 +204,17 @@ pub trait DiscordIpc {
 
     /// Sets a Discord activity.
     ///
-    /// This method is an abstraction of [`send`],
-    /// wrapping it such that only an activity payload
-    /// is required.
-    ///
-    /// [`send`]: #method.send
+    /// This method is an abstraction of [`send`](Self::send), wrapping it such
+    /// that only an activity payload is required.
     ///
     /// # Errors
     /// Returns an `Err` variant if sending the payload failed.
+    ///
+    /// # Examples
+    /// TODO
+    ///
+    /// See [SET_ACTIVITY]
+    /// (https://discord.com/developers/docs/topics/rpc#setactivity).
     fn set_activity(&mut self, activity_payload: Activity) -> Result<()> {
         self.command(
             "SET_ACTIVITY",
@@ -225,12 +227,17 @@ pub trait DiscordIpc {
         Ok(())
     }
 
-    /// Works the same as as [`set_activity`] but clears activity instead.
-    ///
-    /// [`set_activity`]: #method.set_activity
+    /// Works the same as as [`set_activity`](Self::set_activity) but clears
+    /// activity instead.
     ///
     /// # Errors
     /// Returns an `Err` variant if sending the payload failed.
+    ///
+    /// # Examples
+    /// TODO
+    ///
+    /// See [SET_ACTIVITY]
+    /// (https://discord.com/developers/docs/topics/rpc#setactivity).
     fn clear_activity(&mut self) -> Result<()> {
         self.command(
             "SET_ACTIVITY",
@@ -243,14 +250,22 @@ pub trait DiscordIpc {
         Ok(())
     }
 
-    /// Used to authorize the client, popping up a modal in-app for user authorization.
+    /// Used to authorize the client, popping up a modal in-app for user
+    /// authorization.
     ///
-    /// Scopes must be from [this list](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
-    /// Returned value is an OAuth2 authorization code which can be used for an access token.
+    /// Scopes must be from [this list]
+    /// (https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+    /// Returned value is an OAuth2 authorization code which can be used for an
+    /// access token.
     ///
-    /// Authorization and authentication is necessary for all scopes except setting activities.
+    /// Authorization and authentication is necessary for all scopes except
+    /// setting activities.
     ///
-    /// See [AUTHORIZE](https://discord.com/developers/docs/topics/rpc#authorize).
+    /// # Examples
+    /// TODO
+    ///
+    /// See [AUTHORIZE]
+    /// (https://discord.com/developers/docs/topics/rpc#authorize).
     fn authorize(&mut self, scopes: &[&str]) -> Result<String> {
         let args = json!({
             "client_id": self.get_client_id(),
@@ -264,9 +279,14 @@ pub trait DiscordIpc {
             .to_string())
     }
 
-    /// Used to authenticate the client. Access token is given by the standard OAuth2 token process.
+    /// Used to authenticate the client. Access token is given by the standard
+    /// OAuth2 token process.
     ///
-    /// See [AUTHENTICATE](https://discord.com/developers/docs/topics/rpc#authenticate).
+    /// # Examples
+    /// TODO
+    ///
+    /// See [AUTHENTICATE]
+    /// (https://discord.com/developers/docs/topics/rpc#authenticate).
     fn authenticate(&mut self, access_token: &str) -> Result<()> {
         let args = json!({ "access_token": access_token });
         let v = self.command("AUTHENTICATE", args)?;
@@ -280,24 +300,39 @@ pub trait DiscordIpc {
 
     /// Gets the current voice settings of the client.
     ///
-    /// See [GET_VOICE_SETTINGS](https://discord.com/developers/docs/topics/rpc#getvoicesettings).
+    /// # Examples
+    /// TODO
+    ///
+    /// See [GET_VOICE_SETTINGS]
+    /// (https://discord.com/developers/docs/topics/rpc#getvoicesettings).
     fn get_voice_settings(&mut self) -> Result<VoiceSettings> {
         let args = json!({});
         let d = self.command("GET_VOICE_SETTINGS", args)?;
-        Ok(serde_json::from_value(d).map_err(|_| Error::JsonParseResponse)?)
+        serde_json::from_value(d).map_err(|_| Error::JsonParseResponse)
     }
 
-    /// Sets the current voice settings of the client. Returns the current complete state of voice settings.
+    /// Sets the current voice settings of the client. Returns the current
+    /// complete state of voice settings.
     ///
-    /// Only one RPC client may control these settings at a time. No two clients may have the "rpc.voice.write" scope at once.
+    /// Only one RPC client may control these settings at a time. No two
+    /// clients may have the "rpc.voice.write" scope at once.
     ///
-    /// See [SET_VOICE_SETTINGS](https://discord.com/developers/docs/topics/rpc#setvoicesettings).
+    /// # Examples
+    /// TODO
+    ///
+    /// See [SET_VOICE_SETTINGS]
+    /// (https://discord.com/developers/docs/topics/rpc#setvoicesettings).
     fn set_voice_settings(&mut self, args: VoiceSettings) -> Result<VoiceSettings> {
         let args = json!(args);
         let d = self.command("SET_VOICE_SETTINGS", args)?;
-        Ok(serde_json::from_value(d).map_err(|_| Error::JsonParseResponse)?)
+        serde_json::from_value(d).map_err(|_| Error::JsonParseResponse)
     }
 
-    /// Closes the Discord IPC connection. Implementation is dependent on platform.
+    /// Closes the Discord IPC connection. Implementation is dependent on
+    /// platform.
+    ///
+    /// # Errors
+    /// Returns an `Err` variant if the socket failed to send the closing
+    /// request or to flush the socket
     fn close(&mut self) -> Result<()>;
 }

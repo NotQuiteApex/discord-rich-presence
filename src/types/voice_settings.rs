@@ -241,8 +241,8 @@ impl ShortcutKeyCombo {
     /// Creates a new `ShortcutKeyCombo`.
     pub fn new(key_type: ShortcutKeyType, code: usize, name: impl ToString) -> Self {
         Self {
-            key_type: key_type,
-            code: code,
+            key_type,
+            code,
             name: name.to_string(),
         }
     }
