@@ -4,7 +4,10 @@
 
 use serde_derive::{Deserialize, Serialize};
 
-/// Discord voice settings. See [Discord RPC docs](https://discord.com/developers/docs/topics/rpc#getvoicesettings-get-voice-settings-response-structure) for details.
+/// Discord voice settings.
+///
+/// See Discord docs on
+/// [Voice Settings](https://discord.com/developers/docs/topics/rpc#getvoicesettings-get-voice-settings-response-structure).
 #[serde_with::skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct VoiceSettings {
@@ -98,7 +101,10 @@ impl VoiceSettings {
     }
 }
 
-/// Voice input settings. See [Discord RPC docs](https://discord.com/developers/docs/topics/rpc#getvoicesettings-voice-settings-input-object) for details.
+/// Voice input settings.
+///
+/// See Discord docs on
+/// [Voice Input Settings](https://discord.com/developers/docs/topics/rpc#getvoicesettings-voice-settings-input-object).
 #[serde_with::skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct VoiceInputSettings {
@@ -128,7 +134,10 @@ impl VoiceInputSettings {
     }
 }
 
-/// Voice output settings. See [Discord RPC docs](https://discord.com/developers/docs/topics/rpc#getvoicesettings-voice-settings-output-object) for details.
+/// Voice output settings.
+///
+/// See Discord docs on
+/// [Voice Output Settings](https://discord.com/developers/docs/topics/rpc#getvoicesettings-voice-settings-output-object).
 #[serde_with::skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct VoiceOutputSettings {
@@ -168,7 +177,10 @@ pub struct VoiceAvailableDevice {
     pub name: String,
 }
 
-/// Voice mode settings. See [Discord RPC docs](https://discord.com/developers/docs/topics/rpc#getvoicesettings-voice-settings-mode-object) for details.
+/// Voice mode settings.
+///
+/// See Discord docs on
+/// [Voice Mode Settings](https://discord.com/developers/docs/topics/rpc#getvoicesettings-voice-settings-mode-object).
 #[serde_with::skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct VoiceModeSettings {

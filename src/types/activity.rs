@@ -6,7 +6,8 @@ use serde_repr::Serialize_repr;
 
 /// A struct representing a Discord rich presence activity.
 ///
-/// See [Activity Structure](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-structure).
+/// See Discord docs on
+/// [Activity Structure](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-structure).
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone, Default)]
 pub struct Activity {
@@ -93,7 +94,8 @@ impl Activity {
 
 /// A struct representing an `Activity`'s timestamps.
 ///
-/// See [Acitivity Timestamps](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-timestamps).
+/// See Discord docs on
+/// [Acitivity Timestamps](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-timestamps).
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone, Default)]
 pub struct Timestamps {
@@ -123,7 +125,8 @@ impl Timestamps {
 
 /// A struct representing an `Activity`'s game party.
 ///
-/// See [Activity Party](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-party).
+/// See Discord docs on
+/// [Activity Party](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-party).
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone, Default)]
 pub struct Party {
@@ -153,9 +156,11 @@ impl Party {
 
 /// A struct representing the art assets and hover text used by an `Activity`.
 ///
-/// See [Activity Assets](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-party).
+/// See Discord docs on
+/// [Activity Assets](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-assets).
 ///
-/// Images must be provided in a specific form, see [Activity Asset Image](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-asset-image).
+/// Images must be provided in a specific form, see Discord docs on
+/// [Activity Asset Image](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-asset-image).
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone, Default)]
 pub struct Assets {
@@ -201,7 +206,8 @@ impl Assets {
 
 /// A struct representing the secrets used by an `Activity`.
 ///
-/// See [Activity Secrets](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-secrets).
+/// See Discord docs on
+/// [Activity Secrets](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-secrets).
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone, Default)]
 pub struct Secrets {
@@ -241,7 +247,8 @@ impl Secrets {
 ///
 /// An activity may have a maximum of 2 buttons.
 ///
-/// See [Activity Buttons](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-buttons).
+/// See Discord docs on
+/// [Activity Buttons](https://discord.com/developers/docs/events/gateway-events#activity-object-activity-buttons).
 #[derive(Serialize, Clone)]
 pub struct Button {
     /// Text shown on the button (min: 1, max: 32 characters)

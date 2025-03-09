@@ -11,8 +11,7 @@ type Result<T> = std::result::Result<T, Error>;
 
 /// A client that connects to and communicates with the Discord IPC.
 ///
-/// Implemented via the [`DiscordIpcClient`](struct@crate::DiscordIpcClient)
-/// struct.
+/// Implemented via the [`DiscordIpcClient`](crate::DiscordIpcClient) struct.
 pub trait DiscordIpc {
     /// Connects the client to the Discord IPC.
     ///
@@ -151,8 +150,8 @@ pub trait DiscordIpc {
 
     /// Sends a command to the Discord IPC.
     ///
-    /// This sends a command to Discord, as described [here]
-    /// (https://discord.com/developers/docs/topics/rpc#commands-and-events).
+    /// This sends a command to Discord, as described
+    /// [here](https://discord.com/developers/docs/topics/rpc#commands-and-events).
     ///
     /// The return value is the "data" field from the response payload.
     ///
@@ -213,8 +212,8 @@ pub trait DiscordIpc {
     /// # Examples
     /// TODO
     ///
-    /// See [SET_ACTIVITY]
-    /// (https://discord.com/developers/docs/topics/rpc#setactivity).
+    /// See Discord docs on
+    /// [SET_ACTIVITY](https://discord.com/developers/docs/topics/rpc#setactivity).
     fn set_activity(&mut self, activity_payload: Activity) -> Result<()> {
         self.command(
             "SET_ACTIVITY",
@@ -236,8 +235,8 @@ pub trait DiscordIpc {
     /// # Examples
     /// TODO
     ///
-    /// See [SET_ACTIVITY]
-    /// (https://discord.com/developers/docs/topics/rpc#setactivity).
+    /// See Discord docs on
+    /// [SET_ACTIVITY](https://discord.com/developers/docs/topics/rpc#setactivity).
     fn clear_activity(&mut self) -> Result<()> {
         self.command(
             "SET_ACTIVITY",
@@ -253,8 +252,8 @@ pub trait DiscordIpc {
     /// Used to authorize the client, popping up a modal in-app for user
     /// authorization.
     ///
-    /// Scopes must be from [this list]
-    /// (https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
+    /// Scopes must be from
+    /// [this list](https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes).
     /// Returned value is an OAuth2 authorization code which can be used for an
     /// access token.
     ///
@@ -264,8 +263,8 @@ pub trait DiscordIpc {
     /// # Examples
     /// TODO
     ///
-    /// See [AUTHORIZE]
-    /// (https://discord.com/developers/docs/topics/rpc#authorize).
+    /// See Discord docs on
+    /// [AUTHORIZE](https://discord.com/developers/docs/topics/rpc#authorize).
     fn authorize(&mut self, scopes: &[&str]) -> Result<String> {
         let args = json!({
             "client_id": self.get_client_id(),
@@ -285,8 +284,8 @@ pub trait DiscordIpc {
     /// # Examples
     /// TODO
     ///
-    /// See [AUTHENTICATE]
-    /// (https://discord.com/developers/docs/topics/rpc#authenticate).
+    /// See Discord docs on
+    /// [AUTHENTICATE](https://discord.com/developers/docs/topics/rpc#authenticate).
     fn authenticate(&mut self, access_token: &str) -> Result<()> {
         let args = json!({ "access_token": access_token });
         let v = self.command("AUTHENTICATE", args)?;
@@ -303,8 +302,8 @@ pub trait DiscordIpc {
     /// # Examples
     /// TODO
     ///
-    /// See [GET_VOICE_SETTINGS]
-    /// (https://discord.com/developers/docs/topics/rpc#getvoicesettings).
+    /// See Discord docs on
+    /// [GET_VOICE_SETTINGS](https://discord.com/developers/docs/topics/rpc#getvoicesettings).
     fn get_voice_settings(&mut self) -> Result<VoiceSettings> {
         let args = json!({});
         let d = self.command("GET_VOICE_SETTINGS", args)?;
@@ -320,8 +319,8 @@ pub trait DiscordIpc {
     /// # Examples
     /// TODO
     ///
-    /// See [SET_VOICE_SETTINGS]
-    /// (https://discord.com/developers/docs/topics/rpc#setvoicesettings).
+    /// See Discord docs on
+    /// [SET_VOICE_SETTINGS](https://discord.com/developers/docs/topics/rpc#setvoicesettings).
     fn set_voice_settings(&mut self, args: VoiceSettings) -> Result<VoiceSettings> {
         let args = json!(args);
         let d = self.command("SET_VOICE_SETTINGS", args)?;
