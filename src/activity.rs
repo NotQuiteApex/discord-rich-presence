@@ -142,8 +142,6 @@ pub enum ActivityType {
     Listening = 2,
     /// Activity type "Watching X"
     Watching = 3,
-    /// Activity type, "<custom status message>". Supported in some inofficial discord clients
-    Custom = 4,
     /// Activity type "Competing in X"
     Competing = 5,
 }
