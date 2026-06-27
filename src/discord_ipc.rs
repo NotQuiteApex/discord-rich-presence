@@ -28,11 +28,11 @@ pub trait DiscordIpc {
     /// let mut client = discord_rich_presence::new_client("<some client id>")?;
     /// client.connect()?;
     /// ```
-    fn connect(&mut self) -> Result<()> {
+    fn connect(&mut self) -> Result<Value> {
         self.connect_ipc()?;
-        self.send_handshake()?;
+        let rdy = self.send_handshake()?;
 
-        Ok(())
+        Ok(rdy)
     }
 
     /// Reconnects to the Discord IPC.
@@ -54,12 +54,12 @@ pub trait DiscordIpc {
     /// client.close()?;
     /// client.reconnect()?;
     /// ```
-    fn reconnect(&mut self) -> Result<()> {
+    fn reconnect(&mut self) -> Result<Value> {
         self.close()?;
         self.connect_ipc()?;
-        self.send_handshake()?;
+        let rdy = self.send_handshake()?;
 
-        Ok(())
+        Ok(rdy)
     }
 
     #[doc(hidden)]
@@ -80,7 +80,7 @@ pub trait DiscordIpc {
     /// # Errors
     ///
     /// Returns an `Err` variant if sending the handshake failed.
-    fn send_handshake(&mut self) -> Result<()> {
+    fn send_handshake(&mut self) -> Result<Value> {
         self.send(
             json!({
                 "v": 1,
@@ -90,9 +90,9 @@ pub trait DiscordIpc {
         )?;
 
         // TODO: Return an Err if the handshake is rejected
-        self.recv()?;
+        let (_, ready) = self.recv()?;
 
-        Ok(())
+        Ok(ready)
     }
 
     /// Sends JSON data to the Discord IPC.
