@@ -13,6 +13,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => (),
     }
 
-    client.close()?;
+    println!("Clearing activity...");
+    client.clear_activity()?;
+
+    println!("Activity cleared! Going to exit...");
+    match client.close() {
+        Ok(()) => (),
+        Err(err) => println!("Error closing IPC connection: {}", err),
+    }
+
     Ok(())
 }

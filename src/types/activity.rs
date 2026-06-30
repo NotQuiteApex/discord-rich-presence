@@ -3,13 +3,28 @@
 
 use serde_derive::Serialize;
 use serde_repr::Serialize_repr;
+use std::borrow::Cow;
 
 /// A struct representing a Discord rich presence activity
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone)]
 pub struct Activity<'a> {
-    state: Option<&'a str>,
-    details: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    state: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    state_url: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    details: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    details_url: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     timestamps: Option<Timestamps>,
     party: Option<Party<'a>>,
     assets: Option<Assets<'a>>,
@@ -17,13 +32,27 @@ pub struct Activity<'a> {
     buttons: Option<Vec<Button<'a>>>,
     #[serde(rename = "type")]
     activity_type: Option<ActivityType>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    status_display_type: Option<StatusDisplayType>,
 }
 
 /// A struct representing an `Activity`'s timestamps
-#[serde_with::skip_serializing_none]
+///
+/// For `ActivityType::Listening` and `ActivityType::Watching`,
+/// including both `start` and `end` timestamps will display
+/// a time bar
+///
+/// Note that all methods return `Self`, and can be chained
+/// for fluency
 #[derive(Serialize, Clone)]
 pub struct Timestamps {
+    /// Unix time (in milliseconds) of when the activity started
+    #[serde(skip_serializing_if = "Option::is_none")]
     start: Option<i64>,
+
+    /// Unix time (in milliseconds) of when the activity ends
+    #[serde(skip_serializing_if = "Option::is_none")]
     end: Option<i64>,
 }
 
@@ -31,7 +60,10 @@ pub struct Timestamps {
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone)]
 pub struct Party<'a> {
-    id: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     size: Option<[i32; 2]>,
 }
 
@@ -39,19 +71,37 @@ pub struct Party<'a> {
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone)]
 pub struct Assets<'a> {
-    large_image: Option<&'a str>,
-    large_text: Option<&'a str>,
-    small_image: Option<&'a str>,
-    small_text: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    large_image: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    large_text: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    large_url: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    small_image: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    small_text: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    small_url: Option<Cow<'a, str>>,
 }
 
 /// A struct representing the secrets used by an `Activity`
 #[serde_with::skip_serializing_none]
 #[derive(Serialize, Clone)]
 pub struct Secrets<'a> {
-    join: Option<&'a str>,
-    spectate: Option<&'a str>,
-    r#match: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    join: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    spectate: Option<Cow<'a, str>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    r#match: Option<Cow<'a, str>>,
 }
 
 /// A struct representing the buttons that are attached to an `Activity`
@@ -59,8 +109,8 @@ pub struct Secrets<'a> {
 /// An activity may have a maximum of 2 buttons
 #[derive(Serialize, Clone)]
 pub struct Button<'a> {
-    label: &'a str,
-    url: &'a str,
+    label: Cow<'a, str>,
+    url: Cow<'a, str>,
 }
 
 /// An enum representing the Activity Type of the `Activity`
@@ -73,56 +123,103 @@ pub enum ActivityType {
     Listening = 2,
     /// Activity type "Watching X"
     Watching = 3,
+    /// Activity type, "<custom status message>". Supported in some inofficial discord clients
+    Custom = 4,
     /// Activity type "Competing in X"
     Competing = 5,
 }
 
+/// A struct to set the Status Display Type of the `Activity`
+/// Controls which field is displayed in the user's status text in the member list
+#[derive(Serialize_repr, Clone)]
+#[repr(u8)]
+pub enum StatusDisplayType {
+    /// "Listening to Spotify"
+    Name = 0,
+    /// "Listening to Rick Astley"
+    State = 1,
+    /// "Listening to Never Gonna Give You Up"
+    Details = 2,
+}
+
 impl<'a> Activity<'a> {
     /// Creates a new `Activity`
-    pub fn new() -> Self {
+    #[must_use]
+    pub const fn new() -> Self {
         Activity {
+            name: None,
             state: None,
+            state_url: None,
             details: None,
+            details_url: None,
             assets: None,
             buttons: None,
             party: None,
             secrets: None,
             timestamps: None,
             activity_type: None,
+            status_display_type: None,
         }
     }
 
+    /// Sets the name of the activity (overrides default App name)
+    #[must_use]
+    pub fn name<S: Into<Cow<'a, str>>>(mut self, name: S) -> Self {
+        self.name = Some(name.into());
+        self
+    }
+
     /// Sets the state of the activity
-    pub fn state(mut self, state: &'a str) -> Self {
-        self.state = Some(state);
+    #[must_use]
+    pub fn state<S: Into<Cow<'a, str>>>(mut self, state: S) -> Self {
+        self.state = Some(state.into());
+        self
+    }
+
+    /// Sets the state URL of the activity
+    #[must_use]
+    pub fn state_url<S: Into<Cow<'a, str>>>(mut self, state_url: S) -> Self {
+        self.state_url = Some(state_url.into());
         self
     }
 
     /// Sets the details of the activity
-    pub fn details(mut self, details: &'a str) -> Self {
-        self.details = Some(details);
+    #[must_use]
+    pub fn details<S: Into<Cow<'a, str>>>(mut self, details: S) -> Self {
+        self.details = Some(details.into());
+        self
+    }
+
+    /// Sets the details URL of the activity
+    #[must_use]
+    pub fn details_url<S: Into<Cow<'a, str>>>(mut self, details_url: S) -> Self {
+        self.details_url = Some(details_url.into());
         self
     }
 
     /// Add a `Timestamps` to this activity
-    pub fn timestamps(mut self, timestamps: Timestamps) -> Self {
+    #[must_use]
+    pub const fn timestamps(mut self, timestamps: Timestamps) -> Self {
         self.timestamps = Some(timestamps);
         self
     }
 
     /// Add a `Party` to this activity
+    #[must_use]
     pub fn party(mut self, party: Party<'a>) -> Self {
         self.party = Some(party);
         self
     }
 
     /// Add an `Assets` to this activity
+    #[must_use]
     pub fn assets(mut self, assets: Assets<'a>) -> Self {
         self.assets = Some(assets);
         self
     }
 
     /// Add a `Secrets` to this activity
+    #[must_use]
     pub fn secrets(mut self, secrets: Secrets<'a>) -> Self {
         self.secrets = Some(secrets);
         self
@@ -131,6 +228,7 @@ impl<'a> Activity<'a> {
     /// Add a `Vec` of `Button`s to this activity
     ///
     /// An activity may contain no more than 2 buttons
+    #[must_use]
     pub fn buttons(mut self, buttons: Vec<Button<'a>>) -> Self {
         // API call fails if the array is empty, so we skip serialization
         // entirely if this is the case
@@ -143,13 +241,21 @@ impl<'a> Activity<'a> {
     }
 
     /// Add an `ActivityType` to this activity
-    pub fn activity_type(mut self, activity_type: ActivityType) -> Self {
+    #[must_use]
+    pub const fn activity_type(mut self, activity_type: ActivityType) -> Self {
         self.activity_type = Some(activity_type);
+        self
+    }
+
+    /// Add a `StatusDisplayType` to this activity
+    #[must_use]
+    pub const fn status_display_type(mut self, status_display_type: StatusDisplayType) -> Self {
+        self.status_display_type = Some(status_display_type);
         self
     }
 }
 
-impl<'a> Default for Activity<'a> {
+impl Default for Activity<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -157,21 +263,24 @@ impl<'a> Default for Activity<'a> {
 
 impl Timestamps {
     /// Creates a new `Timestamps`
-    pub fn new() -> Self {
-        Timestamps {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
             start: None,
             end: None,
         }
     }
 
     /// Sets the start time
-    pub fn start(mut self, start: i64) -> Self {
+    #[must_use]
+    pub const fn start(mut self, start: i64) -> Self {
         self.start = Some(start);
         self
     }
 
     /// Sets the end time
-    pub fn end(mut self, end: i64) -> Self {
+    #[must_use]
+    pub const fn end(mut self, end: i64) -> Self {
         self.end = Some(end);
         self
     }
@@ -185,16 +294,18 @@ impl Default for Timestamps {
 
 impl<'a> Party<'a> {
     /// Creates a new `Party`
-    pub fn new() -> Self {
-        Party {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
             id: None,
             size: None,
         }
     }
 
     /// Sets the ID of the party
-    pub fn id(mut self, id: &'a str) -> Self {
-        self.id = Some(id);
+    #[must_use]
+    pub fn id<S: Into<Cow<'a, str>>>(mut self, id: S) -> Self {
+        self.id = Some(id.into());
         self
     }
 
@@ -206,13 +317,14 @@ impl<'a> Party<'a> {
     /// // of 1, and a max size of 3
     /// let party = Party::new().size([1, 3])
     /// ```
-    pub fn size(mut self, size: [i32; 2]) -> Self {
+    #[must_use]
+    pub const fn size(mut self, size: [i32; 2]) -> Self {
         self.size = Some(size);
         self
     }
 }
 
-impl<'a> Default for Party<'a> {
+impl Default for Party<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -220,51 +332,64 @@ impl<'a> Default for Party<'a> {
 
 impl<'a> Assets<'a> {
     /// Creates a new `Assets`
-    pub fn new() -> Self {
-        Assets {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
             large_image: None,
             large_text: None,
+            large_url: None,
             small_image: None,
             small_text: None,
+            small_url: None,
         }
     }
 
-    /// Sets the name of the art asset to be used as the large
-    /// image
-    ///
-    /// Alternatively, the URL of the resource to be used as
-    /// the large image
-    pub fn large_image(mut self, large_image: &'a str) -> Self {
-        self.large_image = Some(large_image);
+    /// Sets the asset name or URL to be used as the large image
+    #[must_use]
+    pub fn large_image<S: Into<Cow<'a, str>>>(mut self, large_image: S) -> Self {
+        self.large_image = Some(large_image.into());
         self
     }
 
     /// Sets the text to be shown when hovering over the large
     /// image
-    pub fn large_text(mut self, large_text: &'a str) -> Self {
-        self.large_text = Some(large_text);
+    #[must_use]
+    pub fn large_text<S: Into<Cow<'a, str>>>(mut self, large_text: S) -> Self {
+        self.large_text = Some(large_text.into());
         self
     }
 
-    /// Sets the name of the art asset to be used as the small
-    /// image
-    ///
-    /// Alternatively, the URL of the resource to be used as
-    /// the small image
-    pub fn small_image(mut self, small_image: &'a str) -> Self {
-        self.small_image = Some(small_image);
+    /// Sets the url to be shown when clicking the large image
+    #[must_use]
+    pub fn large_url<S: Into<Cow<'a, str>>>(mut self, large_url: S) -> Self {
+        self.large_url = Some(large_url.into());
+        self
+    }
+
+    /// Sets the asset name or URL to be used as the small image
+    #[must_use]
+    pub fn small_image<S: Into<Cow<'a, str>>>(mut self, small_image: S) -> Self {
+        self.small_image = Some(small_image.into());
         self
     }
 
     /// Sets the text that is shown when hovering over the small
     /// image
-    pub fn small_text(mut self, small_text: &'a str) -> Self {
-        self.small_text = Some(small_text);
+    #[must_use]
+    pub fn small_text<S: Into<Cow<'a, str>>>(mut self, small_text: S) -> Self {
+        self.small_text = Some(small_text.into());
+        self
+    }
+
+    /// Sets the url to be shown when clicking the small image
+    #[must_use]
+    pub fn small_url<S: Into<Cow<'a, str>>>(mut self, small_url: S) -> Self {
+        self.small_url = Some(small_url.into());
         self
     }
 }
 
-impl<'a> Default for Assets<'a> {
+impl Default for Assets<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -272,8 +397,9 @@ impl<'a> Default for Assets<'a> {
 
 impl<'a> Secrets<'a> {
     /// Creates a new `Secrets`
-    pub fn new() -> Self {
-        Secrets {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
             join: None,
             spectate: None,
             r#match: None,
@@ -281,25 +407,28 @@ impl<'a> Secrets<'a> {
     }
 
     /// Sets the secret for joining a game party
-    pub fn join(mut self, join: &'a str) -> Self {
-        self.join = Some(join);
+    #[must_use]
+    pub fn join<S: Into<Cow<'a, str>>>(mut self, join: S) -> Self {
+        self.join = Some(join.into());
         self
     }
 
     /// Sets the secret for spectating a match
-    pub fn spectate(mut self, spectate: &'a str) -> Self {
-        self.spectate = Some(spectate);
+    #[must_use]
+    pub fn spectate<S: Into<Cow<'a, str>>>(mut self, spectate: S) -> Self {
+        self.spectate = Some(spectate.into());
         self
     }
 
     /// Sets the secret for a specific, instanced match
-    pub fn r#match(mut self, r#match: &'a str) -> Self {
-        self.r#match = Some(r#match);
+    #[must_use]
+    pub fn r#match<S: Into<Cow<'a, str>>>(mut self, r#match: S) -> Self {
+        self.r#match = Some(r#match.into());
         self
     }
 }
 
-impl<'a> Default for Secrets<'a> {
+impl Default for Secrets<'_> {
     fn default() -> Self {
         Self::new()
     }
@@ -312,7 +441,10 @@ impl<'a> Button<'a> {
     /// The label must be 1-32 characters long
     ///
     /// The URL must be 1-512 characters long
-    pub fn new(label: &'a str, url: &'a str) -> Self {
-        Button { label, url }
+    pub fn new<L: Into<Cow<'a, str>>, U: Into<Cow<'a, str>>>(label: L, url: U) -> Self {
+        Self {
+            label: label.into(),
+            url: url.into(),
+        }
     }
 }
