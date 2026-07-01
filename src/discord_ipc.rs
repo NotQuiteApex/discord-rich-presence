@@ -284,6 +284,7 @@ pub trait DiscordIpc {
     fn get_voice_settings(&mut self) -> Result<VoiceSettings> {
         let args = json!({});
         let d = self.command("GET_VOICE_SETTINGS", args)?;
+        log::error!("DISCORD GET_VOICE_SETTINGS: {}", d);
         Ok(serde_json::from_value(d).map_err(|_| Error::JsonParseResponse)?)
     }
 
@@ -295,6 +296,7 @@ pub trait DiscordIpc {
     fn set_voice_settings(&mut self, args: VoiceSettings) -> Result<VoiceSettings> {
         let args = json!(args);
         let d = self.command("SET_VOICE_SETTINGS", args)?;
+        log::error!("DISCORD SET_VOICE_SETTINGS: {}", d);
         Ok(serde_json::from_value(d).map_err(|_| Error::JsonParseResponse)?)
     }
 
