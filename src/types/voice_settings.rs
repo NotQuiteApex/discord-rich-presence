@@ -105,7 +105,7 @@ pub struct VoiceInputSettings {
     /// Device ID of the current input device
     pub device_id: Option<String>,
     /// Input voice level percentage (min: 0, max: 100)
-    pub volume: Option<f32>,
+    pub volume: Option<f64>,
     /// List of available input devices
     pub available_devices: Option<Vec<VoiceAvailableDevice>>,
 }
@@ -122,7 +122,7 @@ impl VoiceInputSettings {
     }
 
     /// Sets the volume of the device.
-    pub fn volume(mut self, volume: f32) -> Self {
+    pub fn volume(mut self, volume: f64) -> Self {
         self.volume = Some(volume);
         self
     }
@@ -135,7 +135,7 @@ pub struct VoiceOutputSettings {
     /// Device ID of the current output device
     pub device_id: Option<String>,
     /// Output voice level percentage (min: 0, max: 200)
-    pub volume: Option<f32>,
+    pub volume: Option<f64>,
     /// List of available output devices
     pub available_devices: Option<Vec<VoiceAvailableDevice>>,
 }
@@ -152,7 +152,7 @@ impl VoiceOutputSettings {
     }
 
     /// Sets the volume of the device.
-    pub fn volume(mut self, volume: f32) -> Self {
+    pub fn volume(mut self, volume: f64) -> Self {
         self.volume = Some(volume);
         self
     }
@@ -178,11 +178,11 @@ pub struct VoiceModeSettings {
     /// whether the Voice Activity threshold is set automatically
     pub auto_threshold: Option<bool>,
     /// Voice Activity threshold (in dB) (min: -100, max: 0)
-    pub threshold: Option<f32>,
+    pub threshold: Option<f64>,
     /// Shortcut Key Combo for activating this voice mode
     pub shortcut: Option<Vec<ShortcutKeyCombo>>,
     /// Push-to-Talk release delay (in ms) (min: 0, max: 2000)
-    pub delay: Option<f32>,
+    pub delay: Option<f64>,
 }
 impl VoiceModeSettings {
     /// Creates a new empty `VoiceModeSettings`.
@@ -203,13 +203,13 @@ impl VoiceModeSettings {
     }
 
     /// Sets the voice activity threshold. Overridden by [`Self::auto_threshold`](Self::auto_threshold).
-    pub fn threshold(mut self, threshold: f32) -> Self {
+    pub fn threshold(mut self, threshold: f64) -> Self {
         self.threshold = Some(threshold);
         self
     }
 
     /// Sets the push-to-talk release delay.
-    pub fn delay(mut self, delay: f32) -> Self {
+    pub fn delay(mut self, delay: f64) -> Self {
         self.delay = Some(delay);
         self
     }
@@ -231,7 +231,8 @@ pub enum VoiceMode {
 pub struct ShortcutKeyCombo {
     #[serde(rename = "type")]
     /// Key Type of shortcut combo
-    pub key_type: ShortcutKeyType,
+    /// (KeyboardKey = 0, MouseButton=1, KeyboardModifierKey=2, GamepadButton=3)
+    pub key_type: usize,
     /// Key scan code
     pub code: usize,
     /// Key name
@@ -239,26 +240,11 @@ pub struct ShortcutKeyCombo {
 }
 impl ShortcutKeyCombo {
     /// Creates a new `ShortcutKeyCombo`.
-    pub fn new(key_type: ShortcutKeyType, code: usize, name: impl ToString) -> Self {
+    pub fn new(key_type: usize, code: usize, name: impl ToString) -> Self {
         Self {
             key_type: key_type,
             code: code,
             name: name.to_string(),
         }
     }
-}
-
-/// Shortcut key type for a shortcut key combo.
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-#[repr(u8)]
-pub enum ShortcutKeyType {
-    /// Keyboard Key
-    KeyboardKey = 0,
-    /// Mouse Button
-    MouseButton = 1,
-    /// Keyboard Modifier Key (Shift, Ctrl, Alt, Super)
-    KeyboardModifierKey = 2,
-    /// Gamepad Button
-    GamepadButton = 3,
 }
